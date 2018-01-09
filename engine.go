@@ -357,9 +357,11 @@ func (engine *Engine) DBMetas() ([]*core.Table, error) {
 		}
 		table.Indexes = indexes
 
+		// if name has ordering (i.e. time DESC), it should return only first element (i.e. time, not DESC)
 		for _, index := range indexes {
 			for _, name := range index.Cols {
-				if col := table.GetColumn(name); col != nil {
+				onlyName := strings.Split(name, " ")
+				if col := table.GetColumn(onlyName[0]); col != nil {
 					col.Indexes[index.Name] = index.Type
 				} else {
 					return nil, fmt.Errorf("Unknown col %s in index %v of table %v, columns %v", name, index.Name, table.Name, table.ColumnsSeq())
